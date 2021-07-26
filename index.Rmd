@@ -1,6 +1,6 @@
 ---
-title: "Open Case Study Search"
-subtitle: "Find the right open case study for you!"
+# title: "Open Case Study Search"
+# subtitle: "Find the right open case study for you!"
 output: html_document
 ---
 
