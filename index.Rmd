@@ -2,8 +2,6 @@
 title: "Open Case Study Search"
 subtitle: "Find the right open case study for you!"
 output: html_document
-runtime: shiny
-weight: 3
 ---
 
 ```{r, include = FALSE}
@@ -230,7 +228,9 @@ library(widgetframe)
 
 
 ```{r table-display, echo = FALSE}
-load(file = here::here("content", "home", "ocs_info.rda"))
+library(DT)
+library(dplyr)
+load(file = here::here("ocs_info.rda"))
 OCS_info_table <- OCS_info %>% 
   select(`Case Study`, `GitHub Repository`, Packages, Objectives, Category)%>%
   DT::datatable(
@@ -240,8 +240,6 @@ OCS_info_table <- OCS_info %>%
     filter = "top",
     options = list(pageLength = 10, scrollY = TRUE, scrollX= TRUE, scrollCollapse = TRUE), extensions = list("Scroller"))
 
-
-widgetframe::frameWidget(OCS_info_table, width = "100%", height = "50%")
 ```
 
 
