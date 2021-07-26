@@ -239,7 +239,7 @@ OCS_info_table <- OCS_info %>%
     escape = FALSE,
     filter = "top",
     options = list(pageLength = 10, scrollY = TRUE, scrollX= TRUE, scrollCollapse = TRUE), extensions = list("Scroller"))
-
+ OCS_info_table
 ```
 
 
