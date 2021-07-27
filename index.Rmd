@@ -250,8 +250,14 @@ OCS_info_table <- OCS_info %>%
     "}"))
   )
   
- OCS_info_table
+
  
 ```
 
+<div style = "width:100%; height:auto; margin: 0; padding:10px">
+
+``` {r fig1, echo = FALSE, include=TRUE}
+ OCS_info_table
+```
+</div>
 
