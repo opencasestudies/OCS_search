@@ -240,10 +240,16 @@ OCS_info_table <- OCS_info %>%
     class = 'cell-border stripe',
     escape = FALSE,
     filter = "top",
-    options = list(pageLength = 10, scrollY = TRUE, scrollX= TRUE, scrollCollapse = TRUE, extensions = list("Scroller"),initComplete = JS(
+    extensions = list("Scroller"),
+    options = list(autoWidth = FALSE,
+  columnDefs = list(width = '90px', width = '200px', width = '90px', width = '200px', width = '100px'),
+  pageLength = 10, scrollY = TRUE, scrollX= TRUE, scrollCollapse = TRUE, fillContainer = TRUE,
+                   initComplete = JS(
     "function(settings, json) {",
     "$(this.api().table().header()).css({'background-color': '#000', 'color': '#fff'});",
-    "}")))
+    "}"))
+  )
+  
  OCS_info_table
  
 ```
