@@ -1,6 +1,6 @@
 ---
-# title: "Open Case Study Search"
-# subtitle: "Find the right open case study for you!"
+title: ""
+subtitle: " "
 output: html_document
 ---
 
@@ -225,7 +225,8 @@ save(OCS_info, file = here::here("content", "home", "ocs_info.rda"))
 library(tidyverse)
 library(widgetframe)
 ```
-
+   
+   
 
 ```{r table-display, echo = FALSE}
 library(DT)
@@ -235,11 +236,16 @@ OCS_info_table <- OCS_info %>%
   select(`Case Study`, `GitHub Repository`, Packages, Objectives, Category)%>%
   DT::datatable(
     rownames = FALSE,
+    #caption = 'Table 1: This is a simple caption for the table.',
     class = 'cell-border stripe',
     escape = FALSE,
     filter = "top",
-    options = list(pageLength = 10, scrollY = TRUE, scrollX= TRUE, scrollCollapse = TRUE), extensions = list("Scroller"))
+    options = list(pageLength = 10, scrollY = TRUE, scrollX= TRUE, scrollCollapse = TRUE, extensions = list("Scroller"),initComplete = JS(
+    "function(settings, json) {",
+    "$(this.api().table().header()).css({'background-color': '#000', 'color': '#fff'});",
+    "}")))
  OCS_info_table
+ 
 ```
 
 
