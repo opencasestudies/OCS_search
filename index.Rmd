@@ -246,7 +246,7 @@ OCS_info_table <- OCS_info %>%
   pageLength = 10, scrollY = TRUE, scrollX= TRUE, scrollCollapse = TRUE, fillContainer = TRUE,
                    initComplete = JS(
     "function(settings, json) {",
-    "$(this.api().table().header()).css({'background-color': '#000', 'color': '#fff'});",
+    "$(this.api().table().header()).css({'background-color': '#888888', 'color': '#fff'});",
     "}"))
   )
   
