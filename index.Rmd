@@ -9,7 +9,6 @@ output: html_document
 #r-on-github - to list functions within repos....etc.
 #gh - to list repos
 #maybe just search websites?
-
 ```
 
 
@@ -22,7 +21,6 @@ URL_OCS <- c("https://github.com/orgs/opencasestudies/repositories")
 webpage <- URL_OCS %>%
   xml2::read_html() 
 webpage
-
 #selecting mostly just the repoinfo
 webpage_element <- webpage %>%
   rvest::html_nodes(xpath='//*[contains(concat( " ", @class, " " ), concat( " ", "d-inline-block", " " ))]')
@@ -30,7 +28,6 @@ attrs_ocs <- webpage_element %>%
   rvest::html_attrs()
 text_ocs <-webpage_element %>%
   rvest::html_text()
-
 #getting the names of the repos from the GitHUB page
 repo_text<-map_df(attrs_ocs, as_tibble) 
 repo_text %<>% 
@@ -42,17 +39,13 @@ repo_text %<>%
   mutate(interactive = str_detect(value, "interactive")) %>%
   filter(interactive == FALSE) %>%
     select(repo_name = value, case_study_name)
-
 repo_non_bp <- repo_text %>% filter(!str_detect(repo_name, "-bp"))
 repo_bp <- repo_text %>% filter(str_detect(repo_name, "-bp")) %>%
                           filter(!str_detect(repo_name, "template|firearm|flex|v2"))
   
-
 # run the fist chunk first!
 repo_non_bp
-
 repo_non_bp <- repo_non_bp %>% filter(!str_detect(repo_name, "firearm")) # get just the health expenditure case study for now - not firearm legislation
-
 # add the health expenditure case study to the list
 repo_bp <-rbind(repo_bp, repo_non_bp)
 ```
@@ -69,7 +62,6 @@ OCS_info <- repo_bp %>%
 
 ```{r, include = FALSE, eval = FALSE}
 #Get Readmes - one example
-
 URL_readme <-c('https://github.com/opencasestudies/ocs-bp-co2-emissions')
 readme_ex <-xml2::read_html(URL_readme)
 webpage_element <- readme_ex %>%
@@ -85,7 +77,6 @@ text_ocs
 
 ```{r, include = FALSE, eval = FALSE}
 ##in case we need something else from the readme
-
 # get_readme <- function(URL){
 #   xml2::read_html(URL) %>%
 #   rvest::html_nodes(xpath='//*[contains(concat( " ", @class, " " ), concat( " ", "container-lg", " " ))]') %>%
@@ -93,7 +84,6 @@ text_ocs
 # 
 # URL <- OCS_info$repo_url
 # Readmes <-pmap(list(URL), get_readme)
-
 ```
 
 ```{r, include = FALSE, eval = FALSE}
@@ -102,18 +92,14 @@ get_title <-function(URL){
   rvest::html_nodes(xpath='//*[contains(concat( " ", @class, " " ), concat( " ", "toc-ignore", " " ))]') %>%
   rvest::html_text()
 }
-
 URL <- OCS_info$case_study_url
 Titles <-pmap(list(URL), get_title)
 Titles %<>% str_remove("Open Case Studies: ") %>%
   str_remove("Open Case Studies : ") %>%
   as_tibble()
-
-
 ```
 
 ```{r, include = FALSE, eval = FALSE}
-
   URL_readme <-c('https://github.com/opencasestudies/ocs-bp-RTC-Wrangling')
 Packages_used <-  xml2::read_html(URL_readme) %>%
         rvest::html_nodes(xpath='//td | //th') %>%
@@ -123,7 +109,6 @@ Packages_used <-  xml2::read_html(URL_readme) %>%
   filter(is_package == "TRUE") %>%
   select(Packages) %>%
   filter(Packages != "Data")
-
 Get_packages <-function(URL){
   xml2::read_html(URL) %>%
   rvest::html_nodes(xpath='//td | //th') %>%
@@ -138,29 +123,23 @@ Get_packages <-function(URL){
   filter(Packages != "Use") %>% 
   arrange(Packages)
 }
-
 URL <- OCS_info$repo_url
 Packages<-pmap(list(URL), Get_packages)
-
   
 ```
 
 ```{r, include = FALSE, eval = FALSE}
 #get Data Science objectives
-
   URL_readme <-c('https://github.com/opencasestudies/ocs-bp-co2-emissions')
 Objectives<-  xml2::read_html(URL_readme) %>%
         rvest::html_nodes(xpath='//li') %>%
         rvest::html_text()
-
 Obj_and_quest <- Objectives %>% as_tibble() %>%
   filter(!str_detect(value, "(?<= )\n{2,}|(\n(?=[:space:]))|→")) %>%
   filter(str_detect(value, "[:space:]")) %>%
   filter(!str_detect(value, "GitHub|Sales|plans|management|guides|Code review|forum|Lab"))
-
 Questions <- Obj_and_quest %>% filter(str_detect(value, "\\?"))
 Objectives <- Obj_and_quest %>% filter(!str_detect(value, "\\?"))
-
 #create functions to do this:
 get_questions <- function(URL){
   xml2::read_html(URL) %>%
@@ -173,7 +152,6 @@ get_questions <- function(URL){
         filter(str_detect(value, "\\?"))%>%
         mutate(value = str_remove(value, "\n"))
 }
-
 get_objectives <- function(URL){
   xml2::read_html(URL) %>%
         rvest::html_nodes(xpath='//li') %>%
@@ -189,13 +167,10 @@ get_objectives <- function(URL){
 ```
 
 ```{r, include = FALSE, eval = FALSE}
-
 library(magrittr)
-
 URL <- OCS_info$repo_url
 Questions<-pmap(list(URL), get_questions)
 Objectives <-pmap(list(URL), get_objectives)
-
 #Collapse the individual tibbles into strings
 make_string <- function(vector){
   toString(pull(vector))
@@ -203,7 +178,6 @@ make_string <- function(vector){
 Packages_again <- pmap(list(Packages), make_string) %>% unlist()
      Obj_again <- pmap(list(Objectives), make_string) %>% unlist()
 Questions_again <- pmap(list(Questions), make_string) %>% unlist()
-
 #Combine all the info and make the links with the appropriate names and open in a new tab (target="_blank")
 OCS_info %<>%
   mutate(Packages = Packages_again,
@@ -216,10 +190,7 @@ OCS_info %<>%
          `Case Study` =  paste0('<a href="',case_study_url,'"',' target="_blank"','>',Title,"</a>"))
 OCS_info %<>% 
   mutate(Category = case_when(str_detect(string = case_study_name, pattern = "bp") ~ 'Bloomberg American Health Initiative <br></br><img src="https://opencasestudies.github.io/img/icon-bahi.png" height="52"> </img>', TRUE ~ 'General <br></br><img src="https://opencasestudies.github.io/img/icon.png" height="52"> </img>' ))
-
-
 save(OCS_info, file = here::here( "ocs_info2.rda"))
-
 ```
 
 
@@ -239,11 +210,8 @@ OCS_info %<>%
 # Then add image for link
 OCS_info %<>%
   mutate(Interactive_version = paste0('<br></br>', '<a href="', Interactive_url,'"',' target="_blank"','>', 'Interactive Version:<br></br><img src=\"https://rsconnect.biostat.jhsph.edu/ocs-bp-opioid-rural-urban-interactive/_w_fa6f6915/www/img/interactive_logo.png" height=\"52\"> </img>', '</a>'))
-
-
 # add bloomberg website link
 OCS_info %<>% mutate(Category = paste0('<br></br> <a href=\"https://americanhealth.jhu.edu/open-case-studies" target=\"_blank\"> <br></br>', Category))
-
 ```
 
 
@@ -251,9 +219,7 @@ OCS_info %<>% mutate(Category = paste0('<br></br> <a href=\"https://americanheal
 ```{r, include = FALSE}
 #Adding static version text
 OCS_info %<>% mutate(Static_version =  paste0('<br></br>', '<a href="', case_study_url,'"',' target="_blank"','>', 'Static Version:<br></br><img src=\"https://opencasestudies.github.io/img/icon-bahi.png" height=\"52\"></img></a>'))
-
 OCS_info %<>% mutate('Case Study' =paste0(OCS_info$Title, OCS_info$Static_version))
-
 #Only add interactive version if url exists
 OCS_info %<>% mutate(`Case Study` = case_when(
   url.exists(Interactive_url) == TRUE ~ paste0(`Case Study`, Interactive_version), 
@@ -269,7 +235,6 @@ save(OCS_info, file = here::here( "ocs_info_int.rda"))
 # adding interactive repo link if separate repo
 load(file = here::here("ocs_info_int.rda"))
 OCS_info %<>% mutate(int_repo_url = paste0(repo_url, "-interactive"))
-
 OCS_info %<>% mutate(int_repo_version =  paste0('<a href="', int_repo_url,'"',' target="_blank"','>',"<br></br>Interactive Version Repository","</a>"))
       
 #Only add interactive version repo if url exists               
@@ -281,7 +246,6 @@ OCS_info %<>% mutate(`GitHub Repository` = case_when(
 ```{r, include = FALSE}
 #adding interactive repo link if branch and already not independent int repo
 OCS_info %<>% mutate(int_repo_branch = paste0(repo_url, "/tree/interactive"))
-
 OCS_info %<>% mutate(int_repo_version =  paste0('<a href="', int_repo_branch,'"',' target="_blank"','>',"<br></br>Interactive Version Repository","</a>"))
       
 #Only add interactive version repo if url exists               
@@ -296,7 +260,6 @@ OCS_info %<>% mutate('Case Study' = case_when(
     str_detect(Category, pattern = "General") == TRUE ~ str_replace(string =OCS_info$`Case Study`, pattern = "icon-bahi.png", replacement = "icon.png"), 
     TRUE ~OCS_info$'Case Study'))
 save(OCS_info, file = here::here( "ocs_info_int_with_repo.rda"))
-
 ```
 
 ```{r table-display, echo = FALSE}
@@ -330,7 +293,6 @@ OCS_info_table <- OCS_info %>%
     "}"))
   )
   
-
  
 ```
 
@@ -340,4 +302,3 @@ OCS_info_table <- OCS_info %>%
  OCS_info_table
 ```
 </div>
-
