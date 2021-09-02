@@ -316,11 +316,11 @@ OCS_info_table <- OCS_info %>%
   # columnDefs = list(width = '300px', width = '200px', width = '90px', width = '200px', width = '100px'),
   
   options = list(autoWidth = TRUE,
-              columnDefs = list(list(targets=c(0), visible=TRUE, width='95'),
-                                list(targets=c(1), visible=TRUE, width='95'),
-                                list(targets=c(2), visible=TRUE, width='90'),
-                                list(targets=c(3), visible=TRUE, width='120'),
-                                list(targets=c(4), visible=TRUE, width='90'),
+              columnDefs = list(list(targets=c(0), visible=TRUE, width='120'),
+                                list(targets=c(1), visible=TRUE, width='120'),
+                                list(targets=c(2), visible=TRUE, width='110'),
+                                list(targets=c(3), visible=TRUE, width='260'),
+                                list(targets=c(4), visible=TRUE, width='100'),
                                 list(targets='_all', visible=FALSE)),
                                 
   pageLength = 10, scrollY = TRUE, scrollX= TRUE, scrollCollapse = TRUE, fillContainer = TRUE,
