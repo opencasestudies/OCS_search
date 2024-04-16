@@ -1,0 +1,80 @@
+---
+title: "dataScraping"
+author: "Carrie Wright"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(magrittr)
+#getting the webpage
+
+URL_OCS <- c("https://github.com/orgs/opencasestudies/repositories")
+webpage <- URL_OCS %>%
+  rvest::session()
+  #xml2::read_html()
+webpage_element <- webpage %>%
+  #rvest::html_elements(xpath='//*[contains(concat( " ", @class, " " ), concat( " ", "d-inline-block", " " ))]')
+  #rvest::html_elements(xpath='//*[@id=":R2l5:-listview-container"]/ul')
+  #rvest::html_elements(xpath='//*[contains(concat( " ", @class, " " ), concat( " ", "clearfix", " " ))] | //*[contains(concat( " ", @class, " " ), concat( " ", "text-bold", " " ))] | //*[contains(concat( " ", @class, " " ), concat( " ", "Box-row", " " ))] | //*[contains(concat( " ", @class, " " ), concat( " ", "flex-auto", " " ))]')
+  rvest::html_elements(xpath='//*[contains(concat( " ", @class, " " ), concat( " ", "text-center", " " ))] | //*[contains(concat( " ", @class, " " ), concat( " ", "Box-row", " " ))]')
+  #rvest::html_elements(xpath='')
+text_ocs <- webpage_element %>%
+  rvest::html_text()
+
+repodf <- data.frame(name = unlist(strsplit(text_ocs, "•Updated"))) %>%
+  mutate(is_case_study = str_detect(name, "^ ocs-bp-")) %>% filter(is_case_study == "TRUE") %>%
+  mutate(is_interactive = str_detect(name, "interactive")) %>% filter(is_interactive == "FALSE") %>%
+  mutate(is_template = str_detect(name, "template")) %>% filter(is_template == "FALSE") %>%
+  separate(name, c("reponame", "extraneous"), "Public") %>% select(-c(extraneous))
+  #need to further modify the name to remove everything after "Public"
+
+repodfog <- data.frame(name = unlist(strsplit(text_ocs, "•Updated"))) #pretty certain this is grabbing just the first page of repositories
+
+```
+
+
+```{r, include = FALSE, eval = FALSE}
+library(tidyverse)
+library(magrittr)
+#getting the webpage
+#URL_OCS <- c("https://github.com/opencasestudies?tab=repositories") #old version
+URL_OCS <- c("https://github.com/orgs/opencasestudies/repositories")
+webpage <- URL_OCS %>%
+  #xml2::read_html() 
+  rvest::session()
+webpage
+#selecting mostly just the repoinfo
+webpage_element <- webpage %>%
+  rvest::html_elements(xpath='//*[@id=":R2l5:-listview-container"]/ul')
+  #rvest::html_elements(xpath='/html/body/div[1]/div[6]/div/react-app/div/div/div/div/main/div[2]/div[3]/div/div/div')
+  #rvest::html_elements(xpath='/html/body/div[1]/div[6]')
+attrs_ocs <- webpage_element %>%
+  rvest::html_attrs()
+text_ocs <-webpage_element %>%
+  rvest::html_text()
+#getting the names of the repos from the GitHUB page
+repo_text<-map_df(attrs_ocs, as_tibble) 
+repo_text %<>% 
+  mutate(is_case_study = str_detect(value, "opencasestudies/ocs")) %>%
+  filter(is_case_study == "TRUE") %>%
+  mutate(is_hovercard = str_detect(value, "hover")) %>%
+  filter(is_hovercard == "FALSE") %>%
+  mutate(case_study_name = str_remove(value, "/opencasestudies/")) %>%
+  mutate(interactive = str_detect(value, "interactive")) %>%
+  filter(interactive == FALSE) %>%
+    select(repo_name = value, case_study_name)
+repo_non_bp <- repo_text %>% filter(!str_detect(repo_name, "-bp"))
+repo_bp <- repo_text %>% filter(str_detect(repo_name, "-bp")) %>%
+                          filter(!str_detect(repo_name, "template|firearm|flex|v2"))
+  
+# run the fist chunk first!
+repo_non_bp
+repo_non_bp <- repo_non_bp %>% filter(!str_detect(repo_name, "firearm")) # get just the health expenditure case study for now - not firearm legislation
+# add the health expenditure case study to the list
+repo_bp <-rbind(repo_bp, repo_non_bp)
+```
