@@ -1,0 +1,11 @@
+
+```{r}
+load(file = here::here("ocs_info_int_with_repo.rda"))
+write_csv(OCS_info, file = "OCS_info.csv")
+
+OCS_info <-OCS_info %>% mutate(`Case Study` = str_replace_all(string = `Case Study`,
+                                                   pattern =  "^https://rsconnect.biostat.jhsph.edu",  replacement = ""))
+
+
+https://ocs-bp-co2-emissions-interactive.fredhutch.org/
+```
