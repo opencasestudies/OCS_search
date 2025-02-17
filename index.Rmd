@@ -1,8 +1,8 @@
 
-```{r table-display, echo = FALSE}
+```{r table-display, echo = FALSE, message=FALSE}
 library(DT)
 library(tidyverse)
-OCS_info <-read_csv("OCS_info.csv")
+OCS_info <-read_csv("OCS_info_co2int_only.csv")
 OCS_info_table <- OCS_info %>% 
   select(`Case Study`, `GitHub Repository`, Packages, Objectives, Category)%>%
   DT::datatable(
